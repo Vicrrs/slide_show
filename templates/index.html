@@ -28,34 +28,42 @@
 
         let images = [];
         let index = 0;
+        const slideshowDiv = document.getElementById('slideshow');
 
         async function fetchImages() {
             const response = await fetch('/api/images');
             images = await response.json();
-            index = 0;
+            return images;
         }
 
-        function showImage() {
+        function updateSlideshow() {
             if (images.length > 0) {
-                const slideshowDiv = document.getElementById('slideshow');
-                slideshowDiv.innerHTML = `<img src="/images/${images[index]}" alt="${images[index]}">`;
+                const timestamp = new Date().getTime();
+                slideshowDiv.innerHTML = `<img src="/images/${images[index]}?t=${timestamp}" alt="${images[index]}">`;
                 index = (index + 1) % images.length;
             }
         }
 
         async function startSlideshow() {
             await fetchImages();
-            showImage();
-            setInterval(showImage, 4000); // Change image every 4 seconds
+            updateSlideshow();
+            setInterval(updateSlideshow, 4000); // Change image every 4 seconds
+
+            socket.on('new_image', async (data) => {
+                await fetchImages();
+                updateSlideshow();
+            });
+
+            socket.on('delete_image', async (data) => {
+                await fetchImages();
+                updateSlideshow();
+            });
+
+            socket.on('update_image', async (data) => {
+                await fetchImages();
+                updateSlideshow();
+            });
         }
-
-        socket.on('new_image', async (data) => {
-            await fetchImages();
-        });
-
-        socket.on('delete_image', async (data) => {
-            await fetchImages();
-        });
 
         startSlideshow();
     </script>

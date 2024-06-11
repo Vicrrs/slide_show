@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+  <head>
+
+    <meta charset="UTF-8" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <link
+
+      href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"
+
+      rel="stylesheet"
+
+    />
+
+    <title>Image Slideshow</title>
+
+    <style>
+
+      body {
+
+        background: #0b2239;
+
+        padding: 20px;
+
+      }
+
+
+
+      #slideshow {
+
+        display: flex;
+
+        align-items: center;
+
+        justify-content: center;
+
+        width: 100%;
+
+        margin-top: 20px;
+
+      }
+
+
+
+      #slideshow > img {
+
+        max-width: 100%;
+
+        max-height: 500px;
+
+        display: block;
+
+        margin: auto;
+
+        border-radius: 20px;
+
+      }
+
+
+
+      .title {
+
+        display: flex;
+
+        flex-direction: row;
+
+        align-items: baseline;
+
+        column-gap: 10px;
+
+        border-bottom: 2px solid #eceef2;
+
+      }
+
+
+
+      .title > p {
+
+        font-size: 28px;
+
+        font-family: "Roboto", sans-serif;
+
+        font-weight: 700;
+
+        font-style: normal;
+
+        color: white;
+
+      }
+
+    </style>
+
+  </head>
+
+  <body>
+
+    <div class="title">
+
+      <img src="./tklogo.png" alt="tklogo" />
+
+      <p>Slides</p>
+
+    </div>
+
+    <div id="slideshow"></div>
+
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.4.1/socket.io.min.js"></script>
+
+    <script>
+
+      const socket = io();
+
+
+
+      let images = [];
+
+      let index = 0;
+
+
+
+      async function fetchImages() {
+
+        const response = await fetch("/api/images");
+
+        images = await response.json();
+
+        index = 0;
+
+      }
+
+
+
+      function showImage() {
+
+        if (images.length > 0) {
+
+          const slideshowDiv = document.getElementById("slideshow");
+
+          slideshowDiv.innerHTML = `<img src="/images/${images[index]}" alt="${images[index]}">`;
+
+          index = (index + 1) % images.length;
+
+        }
+
+      }
+
+
+
+      async function startSlideshow() {
+
+        await fetchImages();
+
+        showImage();
+
+        setInterval(showImage, 4000); // Change image every 4 seconds
+
+      }
+
+
+
+      socket.on("new_image", async (data) => {
+
+        await fetchImages();
+
+      });
+
+
+
+      socket.on("delete_image", async (data) => {
+
+        await fetchImages();
+
+      });
+
+
+
+      startSlideshow();
+
+    </script>
+
+  </body>
+
+</html>
