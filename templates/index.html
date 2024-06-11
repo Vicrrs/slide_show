@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Slideshow</title>
+    <style>
+        #slideshow {
+            width: 80%;
+            margin: auto;
+            text-align: center;
+        }
+        img {
+            max-width: 100%;
+            max-height: 500px;
+            display: block;
+            margin: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>Image Slideshow</h1>
+    <div id="slideshow"></div>
+
+    <script>
+        async function fetchImages() {
+            const response = await fetch('/api/images');
+            const images = await response.json();
+            return images;
+        }
+
+        async function startSlideshow() {
+            const images = await fetchImages();
+            const slideshowDiv = document.getElementById('slideshow');
+            let index = 0;
+
+            setInterval(() => {
+                if (images.length > 0) {
+                    slideshowDiv.innerHTML = `<img src="/images/${images[index]}" alt="${images[index]}">`;
+                    index = (index + 1) % images.length;
+                }
+            }, 3000); // Change image every 3 seconds
+        }
+
+        startSlideshow();
+        setInterval(startSlideshow, 10000); // Refresh the images list every 10 seconds
+    </script>
+</body>
+</html>
