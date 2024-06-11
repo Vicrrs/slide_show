@@ -30,6 +30,13 @@ class ImageHandler(FileSystemEventHandler):
         if event.src_path.lower().endswith(('png', 'jpg', 'jpeg', 'gif')):
             filename = os.path.basename(event.src_path)
             socketio.emit('new_image', {'filename': filename})
+    
+    def on_deleted(self, event):
+        if event.is_directory:
+            return
+        if event.src_path.lower().endswith(('png', 'jpg', 'jpeg', 'gif')):
+            filename = os.path.basename(event.src_path)
+            socketio.emit('delete_image', {'filename': filename})
 
 def start_watching():
     path = IMAGE_FOLDER
