@@ -22,7 +22,10 @@
     <h1>Image Slideshow</h1>
     <div id="slideshow"></div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.4.1/socket.io.min.js"></script>
     <script>
+        const socket = io();
+
         async function fetchImages() {
             const response = await fetch('/api/images');
             const images = await response.json();
@@ -39,11 +42,19 @@
                     slideshowDiv.innerHTML = `<img src="/images/${images[index]}" alt="${images[index]}">`;
                     index = (index + 1) % images.length;
                 }
-            }, 3000); // Change image every 3 seconds
+            }, 4000); // Change image every 3 seconds
         }
 
+        socket.on('new_image', (data) => {
+            const imgElement = document.createElement('img');
+            imgElement.src = `/images/${data.filename}`;
+            imgElement.alt = data.filename;
+
+            const slideshowDiv = document.getElementById('slideshow');
+            slideshowDiv.appendChild(imgElement);
+        });
+
         startSlideshow();
-        setInterval(startSlideshow, 10000); // Refresh the images list every 10 seconds
     </script>
 </body>
 </html>
