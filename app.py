@@ -5,7 +5,6 @@ from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 import threading
 
-
 app = Flask(__name__)
 socketio = SocketIO(app)
 IMAGE_FOLDER = 'images'
@@ -42,6 +41,13 @@ class ImageHandler(FileSystemEventHandler):
         if event.src_path.lower().endswith(('png', 'jpg', 'jpeg', 'gif')):
             filename = os.path.basename(event.src_path)
             socketio.emit('delete_image', {'filename': filename})
+    
+    def on_modified(self, event):
+        if event.is_directory:
+            return
+        if event.src_path.lower().endswith(('png', 'jpg', 'jpeg', 'gif')):
+            filename = os.path.basename(event.src_path)
+            socketio.emit('update_image', {'filename': filename})
 
 
 def start_watching():
