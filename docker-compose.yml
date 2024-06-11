@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./images:/app/images
+      - ./templates:/app/templates
+    environment:
+      - FLASK_ENV=development
+    command: poetry run python app.py
